@@ -111,6 +111,21 @@ local function connectToPlayer(plr)
 	end
 end
 
+local function disconn()
+	if state then
+		for _, i in instances do
+			i:Destroy()
+		end
+		table.clear(instances)
+		state = false
+		if lp.Character then lp.Character.Humanoid.Sit = false end
+		if lp.Character then lp.Character.Humanoid.WalkSpeed = baseSpeed end
+		if lp.Character then lp.Character.Humanoid.JumpPower = baseJPower end
+		workspace.Gravity = baseGravity
+		connFunc:Disconnect()
+	end
+end)
+
 --[[
 	первоначальный цикл, собирает игроков в фрейм 
 	дальше будем отлавливать по входу/выходу, чтобы не удалять/добавлять кнопки заного
@@ -182,18 +197,12 @@ discButton.Name, discButton.Text = 'disc', 'disconnect'
 discButton.Size =  UDim2.new(0.2, 0, 0, 40)
 discButton.Parent = screenGui
 discButton.Position = UDim2.new(0.75, 0, 0.61, 0)
-discButton.MouseButton1Click:Connect(function()
-	if state then
-		for _, i in instances do
-			i:Destroy()
-		end
-		table.clear(instances)
-		state = false
-		if lp.Character then lp.Character.Humanoid.Sit = false end
-		workspace.Gravity = baseGravity
-		connFunc:Disconnect()
-	end
-end)
+discButton.MouseButton1Click:Connect(disconn)
+
+--[[
+	если игрок умер
+]]
+lp.Character.Humanoid.Died:Connect(disconn)
 
 --[[
 	кнопка перепросчета игроков
